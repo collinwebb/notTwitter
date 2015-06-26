@@ -1,6 +1,9 @@
 'use strict';
 
-angular.module('heimdall', [])
+var app = angular.module("notTwitter", ["firebase"]);
 
-.controller('MainCtrl', function($scope){
+app.controller("MainCtrl", function($scope, $firebaseObject){
+  var fbRef = new Firebase("https://nottwitter.firebaseio.com");
+  var syncObject = $firebaseObject(fbRef);
+  syncObject.$bindTo($scope, "data");
 });
