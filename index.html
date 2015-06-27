@@ -13,7 +13,29 @@
     <div class='container' ng-controller="MainCtrl">
       <h1 class='text-center'>notTwitter</h1>
       <h5 class='text-center'>a personalized private twitter</h5>
-      <ng-view></ng-view>
+      <form>
+        <input type="email" ng-model="email" placeholder="email"/>
+        <input type="password" ng-model="password" placeholder="password"/>
+        <button ng-click="authenticate()" type="submit">Sign in</button>
+        <button ng-click="createUser()" type="submit">Sign up</button>
+      </form>
+      <div>
+        <input ng-model="newTweet" placeholder="tweet"/>
+        <button ng-click="makeNewTweet()" ng-disabled="isTweetMaxed()">
+          Tweet
+        </button>
+        <p ng-class="{red: isTweetMaxed()}">
+          {{charactersRemaining()}}
+        </p>
+        <input ng-model="search" placeholder="search"/>
+        <ul ng-repeat="tweet in tweets | filter:search">
+          <li>
+            {{tweet.user.password.email}} said {{tweet.text}} at {{tweet.time}}
+            {{tweet.favorites}}
+            <button ng-click="upvote($index)">+</button>
+          </li>
+        </ul>
+      </div>
     </div>
 
     <script src="/bower_components/jquery/dist/jquery.min.js"></script>
@@ -23,7 +45,5 @@
     <script src="/bower_components/angular-route/angular-route.js"></script>
     <script src="/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
     <script src="script.js"></script>
-    <script src="loginctrl.js"></script>
-    <script src="mainctrl.js"></script>
   </body>
 </html>
