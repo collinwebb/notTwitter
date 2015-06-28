@@ -14,11 +14,21 @@
       <h1 class='text-center'>notTwitter</h1>
       <h5 class='text-center'>a personalized private twitter</h5>
       <form>
-        <input type="email" ng-model="email" placeholder="email"/>
-        <input type="password" ng-model="password" placeholder="password"/>
-        <button ng-click="authenticate()" type="submit">Sign in</button>
-        <button ng-click="createUser()" type="submit">Sign up</button>
+        <input type="text" ng-model="signup.name" placeholder="name"/>
+        <input type="email" ng-model="signup.email" placeholder="email"/>
+        <input type="password" ng-model="signup.password" placeholder="password"/>
+        <button ng-click="createUser(signup)" type="submit">Sign up</button>
       </form>
+      <form>
+        <input type="email" ng-model="login.email" placeholder="email"/>
+        <input type="password" ng-model="login.password" placeholder="password"/>
+        <button ng-click="authenticate(login)" type="submit">Sign in</button>
+      </form>
+      bio
+      <textarea ng-model="bio" placeholder="bio">
+        {{users[activeUser.uid].bio}}
+      </textarea>
+      <button ng-click="updateBio()">update bio</button>
       <div>
         <input ng-model="newTweet" placeholder="tweet"/>
         <button ng-click="makeNewTweet()" ng-disabled="isTweetMaxed()">
@@ -28,13 +38,30 @@
           {{charactersRemaining()}}
         </p>
         <input ng-model="search" placeholder="search"/>
-        <ul ng-repeat="tweet in tweets | filter:search">
+        <ul ng-repeat="tweet in tweets | filter:search | orderBy:'-time'">
           <li>
-            {{tweet.user.password.email}} said {{tweet.text}} at {{tweet.time}}
-            {{tweet.favorites}}
-            <button ng-click="upvote($index)">+</button>
+            <p>
+              {{users[tweet.user.uid].name}} said:
+            </p>
+            <p>
+              {{tweet.text}}
+            </p>
+            <p>
+               at {{tweet.time}}
+            </p>
+            <p>
+              {{tweet.favorites}} favorite(s)
+              <button ng-click="upvote(tweets.length - $index - 1)">+</button>
+            </p>
           </li>
         </ul>
+        <hr>
+        <!-- <ul ng-repeat="user in users | filter:search">
+          <li>
+            {{user.name}}
+            <button ng-click="follow(user)">follow</button>
+          </li>
+        </ul> -->
       </div>
     </div>
 

@@ -33,7 +33,6 @@ var app = angular.module("notTwitter", ["firebase", "ngRoute"])
 // });
 // .service("tweetService", function(){});
 app.controller("MainCtrl", function(User, $rootScope, $scope, $firebaseArray, $firebaseObject){
-  // var ref = new Firebase("https://nottwitter.firebaseio.com");
   $rootScope.afAuth.$onAuth(function(data){
     if(data){
       console.log(data);
@@ -48,16 +47,25 @@ app.controller("MainCtrl", function(User, $rootScope, $scope, $firebaseArray, $f
   });
   $scope.tweets = $firebaseArray($rootScope.fbRef.child("tweets"));
   $scope.users = $firebaseObject($rootScope.fbRef.child("users"));
+  $scope.updateBio = function(){
+    console.log($scope.activeUser.uid)
+    $scope.users[$scope.activeUser.uid]["bio"] = $scope.bio;
+    $scope.users.$save();
+  };
+  $scope.follow = function (user){
+    console.log(user);
+  };
   $scope.resetTweet = function(){
     $scope.newTweet = "";
   };
   $scope.resetTweet();
   $scope.makeNewTweet = function() {
     $scope.tweets.$add({
-      user: $scope.currentUser,
+      user: $scope.activeUser,
       text: $scope.newTweet,
       time: Firebase.ServerValue.TIMESTAMP,
       favorites: 0,
+      favoritedBy: $scope.activeUser.password.email + ",",
       retweets: 0
     });
     $scope.resetTweet();
@@ -69,30 +77,30 @@ app.controller("MainCtrl", function(User, $rootScope, $scope, $firebaseArray, $f
     return $scope.charactersRemaining() < 0;
   };
   $scope.upvote = function(index){
-    $scope.tweets[index].favorites++;
-    $scope.tweets.$save(index).then(function(ref){
-      ref.key() === $scope.tweets[index].$id;
-    });
+    var tweet = $scope.tweets[index];
+    var user = $scope.activeUser.password.email;
+    if (tweet.favoritedBy.split(",").indexOf(user) < 0){
+      tweet.favorites++;
+      tweet.favoritedBy += user + ",";
+      $scope.tweets.$save(index).then(function(ref){
+        ref.key() === $scope.tweets[index].$id;
+      });
+    }
   };
-  $scope.authenticate = function (){
-    $rootScope.fbRef.authWithPassword({
-      email: $scope.email,
-      password : $scope.password
-    }, function(error, authData) {
-      $scope.currentUser = authData;
-    });
+  $scope.authenticate = function (user){
+    User.login(user)
+   .then(function(resp){
+     console.log('logged in');
+     $scope.login = {};
+   });
   };
-  $scope.createUser = function(){
-    $rootScope.fbRef.createUser({
-      email: $scope.email,
-      password: $scope.password
-    }, function(error, userData) {
-      if (error) {
-        console.log("Error creating user:", error);
-      } else {
-        console.log("Successfully created user account with uid:", userData.uid);
-        $scope.authenticate();
-      }
+  $scope.createUser = function(user){
+    User.register(user)
+    .then(function(resp){
+      console.log('registered');
+      $scope.authenticate(user);
+      $scope.users[resp.uid] = {name: user.name};
+      $scope.users.$save();
     });
   };
   $scope.logout = function(){
