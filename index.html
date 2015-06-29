@@ -56,12 +56,12 @@
           </li>
         </ul>
         <hr>
-        <!-- <ul ng-repeat="user in users | filter:search">
+        <ul ng-repeat="user in users">
           <li>
             {{user.name}}
-            <button ng-click="follow(user)">follow</button>
+            <button ng-click="follow(user.uid)">follow</button>
           </li>
-        </ul> -->
+        </ul>
       </div>
     </div>
 

@@ -52,8 +52,8 @@ app.controller("MainCtrl", function(User, $rootScope, $scope, $firebaseArray, $f
     $scope.users[$scope.activeUser.uid]["bio"] = $scope.bio;
     $scope.users.$save();
   };
-  $scope.follow = function (user){
-    console.log(user);
+  $scope.follow = function (userId){
+    $scope.users[$scope.activeUser].follows += userId;
   };
   $scope.resetTweet = function(){
     $scope.newTweet = "";
@@ -99,7 +99,11 @@ app.controller("MainCtrl", function(User, $rootScope, $scope, $firebaseArray, $f
     .then(function(resp){
       console.log('registered');
       $scope.authenticate(user);
-      $scope.users[resp.uid] = {name: user.name};
+      $scope.users[resp.uid] = {
+        name: user.name,
+        uid: resp.uid,
+        follows: resp.uid + ",",
+      };
       $scope.users.$save();
     });
   };
